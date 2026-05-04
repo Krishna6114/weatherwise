@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import SearchBar from './components/SearchBar';
 import CurrentWeather from './components/CurrentWeather';
@@ -39,10 +39,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    getUserLocation();
-  }, []);
+  getUserLocation();
+}, [getUserLocation]);
 
-  const getUserLocation = () => {
+  const getUserLocation = useCallback(() => {
     setLoading(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -58,7 +58,7 @@ function App() {
     } else {
       fetchWeatherByCity('London');
     }
-  };
+  }, []);
 
   const fetchWeatherByCity = async (city) => {
     try {

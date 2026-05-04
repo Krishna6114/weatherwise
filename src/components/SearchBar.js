@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { searchCities } from '../utils/api';
 
@@ -6,6 +6,17 @@ function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+const fetchSuggestions = useCallback(async () => {
+    try {
+      const results = await searchCities(query);
+      setSuggestions(results);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  }, []);
+
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -17,18 +28,9 @@ function SearchBar({ onSearch }) {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [query]);
+  }, [query, fetchSuggestions]);
 
-  const fetchSuggestions = async () => {
-    try {
-      const results = await searchCities(query);
-      setSuggestions(results);
-      setShowSuggestions(true);
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    }
-  };
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
