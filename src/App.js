@@ -38,27 +38,27 @@ function App() {
     setPreferences(loadPreferences());
   }, []);
 
-  useEffect(() => {
-  getUserLocation();
-}, [getUserLocation]);
+  const getUserLocation = () => {
+  setLoading(true);
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        await fetchWeatherByCoords(latitude, longitude);
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        fetchWeatherByCity('London');
+      }
+    );
+  } else {
+    fetchWeatherByCity('London');
+  }
+};
 
-  const getUserLocation = useCallback(() => {
-    setLoading(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          await fetchWeatherByCoords(latitude, longitude);
-        },
-        (error) => {
-          console.error('Geolocation error:', error);
-          fetchWeatherByCity('London');
-        }
-      );
-    } else {
-      fetchWeatherByCity('London');
-    }
-  }, []);
+useEffect(() => {
+  getUserLocation();
+}, []);
 
   const fetchWeatherByCity = async (city) => {
     try {
